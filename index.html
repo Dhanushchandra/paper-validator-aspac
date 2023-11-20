@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local Excel File Reader</title>
+    <script type="text/javascript" src="xlsx.full.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./index.css" />
+    <script src="./animation.js"></script>
+  </head>
+  <body>
+    <!-- Just an image -->
+    <nav class="navbar navbar-light bg-light">
+      <a class="navbar-brand" href="#">
+        <img
+          src="./media/cropped-tem-logo.png"
+          style="margin-left: 20px"
+          width="200"
+          height="30"
+          alt=""
+        />
+      </a>
+    </nav>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="row main">
+          <form id="idForm">
+            <label for="idInput">Enter the Paper ID:</label>
+            <input type="text" id="idInput" />
+            <div class="info">
+              <table class="infoTable" border="1">
+                <tbody>
+                  <tr>
+                    <td>Author Name:</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>Author Email:</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>Registration Date:</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>Author Country:</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>Institution / Organization:</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>Membership Status:</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="congrats">
+                <p></p>
+              </div>
+
+              <div class="earlyBird">
+                <p>You are selected for EarlyBird Plan too!</p>
+              </div>
+            </div>
+            <div class="btns">
+              <button
+                type="button"
+                class="backbtn"
+                onclick="redirectMethod('https://aspac-temscon.com/')"
+              >
+                Back
+              </button>
+              <button type="button" class="checkidbtn" onclick="checkId()">
+                Check ID
+              </button>
+              <button
+                type="button"
+                class="paynowbtn"
+                onclick="redirectMethod('https://in.explara.com/e/aspac-temscon-com')"
+              >
+                Pay Now
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="row content">
+          <ul>
+            <li>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+              Accusamus magni eligendi aperiam cupiditate illum ipsa, provident
+              quas vero tempora consequatur.
+            </li>
+            <li>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum
+              suscipit dignissimos vel accusamus nemo nesciunt quas quam ipsa
+              alias quod?
+            </li>
+            <li>
+              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+              Perspiciatis nostrum blanditiis asperiores dolores dolore minima
+              eos, optio quas natus deserunt quidem numquam! Ullam soluta animi
+              ex quibusdam ipsam est qui?
+            </li>
+            <li>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum
+              suscipit dignissimos vel accusamus nemo nesciunt quas quam ipsa
+              alias quod?
+            </li>
+            <li>
+              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+              Perspiciatis nostrum blanditiis asperiores dolores dolore minima
+              eos, optio quas natus deserunt quidem numquam! Ullam soluta animi
+              ex quibusdam ipsam est qui?
+            </li>
+            <li>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+              Accusamus magni eligendi aperiam cupiditate illum ipsa, provident
+              quas vero tempora consequatur.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <script>
+      let jsonData;
+
+      function readExcelFile() {
+        return new Promise((resolve, reject) => {
+          const filename = "./media/accepted.xlsx"; // Change this to your actual file name
+          const url = filename;
+
+          // Load the Excel file using XHR
+          const xhr = new XMLHttpRequest();
+          xhr.open("GET", url, true);
+          xhr.responseType = "arraybuffer";
+
+          xhr.onload = function (e) {
+            const arrayBuffer = xhr.response;
+
+            if (arrayBuffer) {
+              const data = new Uint8Array(arrayBuffer);
+              const workbook = XLSX.read(data, { type: "array" });
+
+              // Assuming there's only one sheet in the Excel file
+              const sheetName = workbook.SheetNames[0];
+              const sheet = workbook.Sheets[sheetName];
+
+              // Convert sheet data to JSON
+              const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+              // Display the data in an HTML table
+
+              resolve(jsonData); // Resolve the promise with the loaded data
+            } else {
+              console.error("Failed to read the file.");
+              reject(new Error("Failed to read the file."));
+            }
+          };
+
+          xhr.send();
+        });
+      }
+
+      function excelDateToFormattedString(excelDateString) {
+        // Parse the Excel date string
+        const jsDate = new Date(excelDateString);
+
+        // Check if the parsed date is valid
+        if (isNaN(jsDate.getTime())) {
+          throw new Error("Invalid date string");
+        }
+
+        // Format the date as "YYYY-MM-DD"
+        const formattedDate = jsDate.toISOString().split("T")[0];
+
+        return formattedDate;
+      }
+
+      function isIdAccepted(jsonData, idToCheck) {
+        for (let i = 1; i < jsonData.length; i++) {
+          const rowData = jsonData[i];
+
+          if (parseInt(rowData[0]) == idToCheck) {
+            console.log(rowData);
+
+            return {
+              accepted: true,
+              name: rowData[4],
+              email: rowData[5],
+              date: rowData[1],
+              country: rowData[11],
+              organization: rowData[12],
+              membership: rowData[13],
+              registrationDate: excelDateToFormattedString(rowData[1]),
+            };
+          }
+        }
+
+        return {
+          unknownId: true,
+        };
+      }
+
+      function checkId() {
+        const idInput = document.getElementById("idInput").value;
+
+        let unknownId;
+        let accepted;
+        let earlyBird;
+        let name;
+        let email;
+        let date;
+        let country;
+        let organization;
+        let membership;
+
+        const earlyBirdContent = document.querySelector(".earlyBird");
+        const paynowbtn = document.querySelector(".paynowbtn");
+        const checkidbtn = document.querySelector(".checkidbtn");
+        const congratsDiv = document.querySelector(".congrats p");
+        const infoTable = document.querySelector(".infoTable");
+        const nameTd = infoTable.querySelector(
+          "tr:nth-child(1) td:nth-child(2)"
+        );
+        const emailTd = infoTable.querySelector(
+          "tr:nth-child(2)  td:nth-child(2)"
+        );
+        const dateTd = infoTable.querySelector(
+          "tr:nth-child(3)  td:nth-child(2)"
+        );
+        const countryTd = infoTable.querySelector(
+          "tr:nth-child(4)  td:nth-child(2)"
+        );
+        const orgTd = infoTable.querySelector(
+          "tr:nth-child(5)  td:nth-child(2)"
+        );
+        const membershipTd = infoTable.querySelector(
+          "tr:nth-child(6)  td:nth-child(2)"
+        );
+        const textBox = document.getElementById("idInput");
+
+        if (idInput.trim() !== "") {
+          readExcelFile()
+            .then((jsonData) => {
+              const idToCheck = idInput;
+
+              const earlyBirdDate = new Date("2023-09-15T00:00:00Z")
+                .toISOString()
+                .split("T")[0];
+              const result = isIdAccepted(jsonData, idToCheck);
+
+              unknownId = result.unknownId ? result.unknownId : false;
+              accepted = result.accepted ? result.accepted : false;
+              earlyBird = result.registrationDate < earlyBirdDate;
+              name = result.name;
+              email = result.email;
+              date = result.date;
+              country = result.country;
+              organization = result.organization;
+              membership = result.membership;
+
+              console.log({
+                unknownId,
+                accepted,
+                earlyBird,
+                name,
+                email,
+              });
+
+              if (unknownId) {
+                alert("Please Enter Valid Paper Id");
+              }
+
+              if (accepted) {
+                earlyBirdContent.style.display = earlyBird ? "block" : "none";
+                paynowbtn.style.display = "flex";
+                checkidbtn.style.display = "none";
+                congratsDiv.innerHTML =
+                  "Congratulations You Paper has been Accepted for the conference!";
+                textBox.readOnly = true;
+                textBox.style.pointerEvents = "none";
+                infoTable.style.display = "inline-table";
+                nameTd.innerHTML = name;
+                emailTd.innerHTML = email;
+                dateTd.innerHTML = result.registrationDate;
+                countryTd.innerHTML = country;
+                orgTd.innerHTML = organization;
+                membershipTd.innerHTML = membership;
+              }
+              // else {
+              //   infoTable.style.display = "inline-table";
+              //   infoTable.style.border.color = "red";
+              //   nameTd.innerHTML = name;
+              //   emailTd.innerHTML = email;
+              //   congratsDiv.style.color = "red";
+              //   congratsDiv.innerHTML =
+              //     "Sorry, Your Paper has Not Been Accepted for the conference!";
+              // }
+            })
+
+            .catch((error) => {
+              console.error(error);
+            });
+        } else {
+          alert("Please enter an ID.");
+        }
+      }
+
+      function redirectMethod(page) {
+        window.location.href = page;
+      }
+    </script>
+  </body>
+</html>

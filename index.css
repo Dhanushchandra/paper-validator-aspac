@@ -1,0 +1,146 @@
+
+body {
+    font-family: 'Arial', sans-serif;
+    /* background-color: #046BD2; */
+    margin: 0;
+    padding: 0;
+    /* display: flex; */
+    /* align-items: center; */
+    /* justify-content: center; */
+    height: 100vh;
+  }
+
+  .wrap{
+    display: flex;
+    justify-content: center;
+    margin-top: 30px
+  }
+
+  .main {
+    background-color:#ffffff;
+    /* border-radius: 8px; */
+    padding: 20px;
+  
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  label {
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  #idInput {
+    padding: 8px;
+    margin-bottom: 15px;
+    width: 200px;
+    box-sizing: border-box;
+  }
+
+  button {
+    padding: 10px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  .earlyBird{
+    display: none;
+  }
+
+  .earlyBird p{
+        color: orangered;
+        font-weight: 500;
+  }
+
+  .price{
+    display: flex;
+    justify-content: start;
+    font-weight: 600;
+    /* padding: 10px; */
+    display: none;
+    color: orangered;
+  }
+
+  .price p:nth-child(2){
+    color: #45a049;
+    margin-left: 30px;
+  }
+
+  .info{
+    padding: 20px;
+  }
+
+  .content {
+    padding: 50px;
+  }
+
+  .paynowbtn{
+    display: none;
+  }
+
+  .congrats{
+    margin-top: 10px;
+    color: #45a049;
+  }
+
+  .backbtn{
+    background-color: orange;
+    color: black;
+   
+  }
+
+  .backbtn:hover{
+    background-color: orangered;
+    color: white;
+  }
+
+  .btns{
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 20px;
+  }
+
+  table{
+    width: 100%;
+    display:none;
+    
+  }
+
+  table tbody tr{
+    width: 100%;
+  }
+
+  table td{
+    color: #000000;
+    padding: 10px;
+    text-align: center;
+ 
+  }
+
+  tr td:nth-child(odd){
+    color: gray;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  tr td:nth-child(even){
+    color: #000000;
+    font-weight: 400;
+    text-align: left;
+  }
+
+ 
