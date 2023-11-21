@@ -214,6 +214,10 @@
             }
           }
         }
+
+        return {
+          unknownId: true,
+        };
       }
 
       function checkId() {
@@ -268,9 +272,6 @@
                 .split("T")[0];
               const result = isIdAccepted(jsonData, idToCheck);
 
-              console.log(result.registrationDate);
-              console.log(earlyBirdDate);
-
               unknownId = result.unknownId ? result.unknownId : false;
               accepted = result.accepted;
               earlyBird = result.registrationDate < earlyBirdDate;
@@ -281,14 +282,6 @@
               country = result.country;
               organization = result.organization;
               membership = result.membership;
-
-              console.log({
-                unknownId,
-                accepted,
-                earlyBird,
-                name,
-                email,
-              });
 
               if (accepted) {
                 earlyBirdContent.style.display = earlyBird ? "block" : "none";
@@ -310,6 +303,7 @@
               }
 
               if (accepted == false) {
+                textBox.readOnly = true;
                 infoTable.style.display = "inline-table";
                 nameTd.innerHTML = name;
                 checkidbtn.style.opacity = "0.5";
@@ -322,7 +316,7 @@
                 titleTd.innerHTML = title;
                 congratsDiv.style.color = "red";
                 congratsDiv.innerHTML =
-                  "Sorry, Your Paper is Not Selected for the conference!";
+                  "Regret to inform that your paper is not selected for presentation";
               }
 
               if (unknownId) {
