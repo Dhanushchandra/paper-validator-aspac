@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Local Excel File Reader</title>
+    <title>Paper Status</title>
     <script type="text/javascript" src="xlsx.full.min.js"></script>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -60,6 +60,10 @@
                     <td>Membership Status:</td>
                     <td></td>
                   </tr>
+                  <tr>
+                    <td>Title:</td>
+                    <td></td>
+                  </tr>
                 </tbody>
               </table>
 
@@ -68,7 +72,10 @@
               </div>
 
               <div class="earlyBird">
-                <p>You are selected for EarlyBird Plan too!</p>
+                <p>
+                  You qualify for the early bird discount! Kindly retrieve the
+                  early bird discount coupon from your email
+                </p>
               </div>
             </div>
             <div class="btns">
@@ -80,7 +87,7 @@
                 Back
               </button>
               <button type="button" class="checkidbtn" onclick="checkId()">
-                Check ID
+                Procced
               </button>
               <button
                 type="button"
@@ -94,39 +101,21 @@
         </div>
 
         <div class="row content">
+          <h2>Instructions</h2>
+
           <ul>
+            <li>Input your conference paper ID.</li>
+            <li>Proceed by clicking the designated button.</li>
             <li>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-              Accusamus magni eligendi aperiam cupiditate illum ipsa, provident
-              quas vero tempora consequatur.
+              Review the provided details and proceed to make the payment if
+              your paper has been accepted.
             </li>
             <li>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum
-              suscipit dignissimos vel accusamus nemo nesciunt quas quam ipsa
-              alias quod?
+              If you qualify for the early bird discount, use the early bird
+              coupon code found in the email from CMT during the payment
+              process.
             </li>
-            <li>
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-              Perspiciatis nostrum blanditiis asperiores dolores dolore minima
-              eos, optio quas natus deserunt quidem numquam! Ullam soluta animi
-              ex quibusdam ipsam est qui?
-            </li>
-            <li>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum
-              suscipit dignissimos vel accusamus nemo nesciunt quas quam ipsa
-              alias quod?
-            </li>
-            <li>
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-              Perspiciatis nostrum blanditiis asperiores dolores dolore minima
-              eos, optio quas natus deserunt quidem numquam! Ullam soluta animi
-              ex quibusdam ipsam est qui?
-            </li>
-            <li>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-              Accusamus magni eligendi aperiam cupiditate illum ipsa, provident
-              quas vero tempora consequatur.
-            </li>
+            <li>Finalize your payment.</li>
           </ul>
         </div>
       </div>
@@ -136,7 +125,7 @@
 
       function readExcelFile() {
         return new Promise((resolve, reject) => {
-          const filename = "./media/accepted.xlsx"; // Change this to your actual file name
+          const filename = "./media/v2.xlsx"; // Change this to your actual file name
           const url = filename;
 
           // Load the Excel file using XHR
@@ -189,25 +178,42 @@
         for (let i = 1; i < jsonData.length; i++) {
           const rowData = jsonData[i];
 
-          if (parseInt(rowData[0]) == idToCheck) {
-            console.log(rowData);
-
+          if (idToCheck > 644) {
             return {
-              accepted: true,
-              name: rowData[4],
-              email: rowData[5],
-              date: rowData[1],
-              country: rowData[11],
-              organization: rowData[12],
-              membership: rowData[13],
-              registrationDate: excelDateToFormattedString(rowData[1]),
+              unknownId: true,
             };
           }
-        }
 
-        return {
-          unknownId: true,
-        };
+          if (parseInt(rowData[0]) == idToCheck) {
+            if (parseInt(rowData[19]) == 1) {
+              return {
+                accepted: true,
+                title: rowData[3],
+                name: rowData[5],
+                email: rowData[6],
+                date: rowData[1],
+                country: rowData[38],
+                organization: rowData[39],
+                membership: rowData[40],
+                registrationDate: excelDateToFormattedString(rowData[1]),
+              };
+            }
+
+            if (parseInt(rowData[19]) == 0) {
+              return {
+                accepted: false,
+                title: rowData[3],
+                name: rowData[5],
+                email: rowData[6],
+                date: rowData[1],
+                country: rowData[38],
+                organization: rowData[39],
+                membership: rowData[40],
+                registrationDate: excelDateToFormattedString(rowData[1]),
+              };
+            }
+          }
+        }
       }
 
       function checkId() {
@@ -215,6 +221,7 @@
 
         let unknownId;
         let accepted;
+        let title;
         let earlyBird;
         let name;
         let email;
@@ -246,6 +253,9 @@
         const membershipTd = infoTable.querySelector(
           "tr:nth-child(6)  td:nth-child(2)"
         );
+        const titleTd = infoTable.querySelector(
+          "tr:nth-child(7)  td:nth-child(2)"
+        );
         const textBox = document.getElementById("idInput");
 
         if (idInput.trim() !== "") {
@@ -253,16 +263,20 @@
             .then((jsonData) => {
               const idToCheck = idInput;
 
-              const earlyBirdDate = new Date("2023-09-15T00:00:00Z")
+              const earlyBirdDate = new Date("2023-09-16T00:00:00Z")
                 .toISOString()
                 .split("T")[0];
               const result = isIdAccepted(jsonData, idToCheck);
 
+              console.log(result.registrationDate);
+              console.log(earlyBirdDate);
+
               unknownId = result.unknownId ? result.unknownId : false;
-              accepted = result.accepted ? result.accepted : false;
+              accepted = result.accepted;
               earlyBird = result.registrationDate < earlyBirdDate;
               name = result.name;
               email = result.email;
+              title = result.title;
               date = result.date;
               country = result.country;
               organization = result.organization;
@@ -276,16 +290,13 @@
                 email,
               });
 
-              if (unknownId) {
-                alert("Please Enter Valid Paper Id");
-              }
-
               if (accepted) {
                 earlyBirdContent.style.display = earlyBird ? "block" : "none";
                 paynowbtn.style.display = "flex";
                 checkidbtn.style.display = "none";
+                congratsDiv.style.color = "green";
                 congratsDiv.innerHTML =
-                  "Congratulations You Paper has been Accepted for the conference!";
+                  "Congratulations !! Your paper is selected for presentation in the conference";
                 textBox.readOnly = true;
                 textBox.style.pointerEvents = "none";
                 infoTable.style.display = "inline-table";
@@ -295,16 +306,28 @@
                 countryTd.innerHTML = country;
                 orgTd.innerHTML = organization;
                 membershipTd.innerHTML = membership;
+                titleTd.innerHTML = title;
               }
-              // else {
-              //   infoTable.style.display = "inline-table";
-              //   infoTable.style.border.color = "red";
-              //   nameTd.innerHTML = name;
-              //   emailTd.innerHTML = email;
-              //   congratsDiv.style.color = "red";
-              //   congratsDiv.innerHTML =
-              //     "Sorry, Your Paper has Not Been Accepted for the conference!";
-              // }
+
+              if (accepted == false) {
+                infoTable.style.display = "inline-table";
+                nameTd.innerHTML = name;
+                checkidbtn.style.opacity = "0.5";
+                checkidbtn.style.pointerEvents = "none";
+                emailTd.innerHTML = email;
+                dateTd.innerHTML = result.registrationDate;
+                countryTd.innerHTML = country;
+                orgTd.innerHTML = organization;
+                membershipTd.innerHTML = membership;
+                titleTd.innerHTML = title;
+                congratsDiv.style.color = "red";
+                congratsDiv.innerHTML =
+                  "Sorry, Your Paper is Not Selected for the conference!";
+              }
+
+              if (unknownId) {
+                alert("Please Enter Valid Paper Id");
+              }
             })
 
             .catch((error) => {
